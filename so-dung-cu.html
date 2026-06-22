@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Sổ Dụng Cụ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEBE2;
+    --surface:#FBF9F4;
+    --ink:#211F1A;
+    --ink-soft:#5C5848;
+    --line:#D9D3C3;
+    --brass:#A8762E;
+    --brass-deep:#8A5F22;
+    --green:#3C5A45;
+    --green-deep:#2B4636;
+    --rust:#A14A2E;
+    --rust-bg:#F4E3DC;
+    --ok-bg:#E4ECE2;
+    --shadow: 0 1px 2px rgba(33,31,26,0.06), 0 4px 14px rgba(33,31,26,0.07);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;}
+  body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+  }
+  #app{
+    width:100%;
+    max-width:480px;
+    min-height:100vh;
+    background:var(--paper);
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    padding:18px 18px 14px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    border-bottom:1px solid var(--line);
+    background:var(--paper);
+  }
+  header .titleblock{display:flex;flex-direction:column;gap:2px;}
+  header .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--brass-deep);
+  }
+  header h1{
+    font-family:'Zilla Slab',serif;
+    font-weight:700;
+    font-size:26px;
+    margin:0;
+    line-height:1;
+  }
+  .gear-btn{
+    width:38px;height:38px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:var(--surface);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .gear-btn svg{width:18px;height:18px;stroke:var(--ink-soft);}
+
+  /* ---------- Main panels ---------- */
+  main{
+    flex:1;
+    overflow-y:auto;
+    padding:16px 16px 90px;
+  }
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  /* ---------- Search tab ---------- */
+  .search-row{
+    display:flex;
+    gap:8px;
+    margin-bottom:12px;
+  }
+  .search-box{
+    flex:1;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:0 12px;
+  }
+  .search-box svg{width:16px;height:16px;stroke:var(--ink-soft);flex-shrink:0;}
+  .search-box input{
+    border:none;background:transparent;outline:none;
+    font-family:'Inter',sans-serif;font-size:15px;color:var(--ink);
+    padding:11px 0; width:100%;
+  }
+  .refresh-btn{
+    width:42px;flex-shrink:0;
+    border:1px solid var(--line);
+    background:var(--surface);
+    border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+  }
+  .refresh-btn svg{width:17px;height:17px;stroke:var(--green-deep);transition:transform .5s;}
+  .refresh-btn.spin svg{animation:spin 0.8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .chips{
+    display:flex;gap:6px;overflow-x:auto;padding-bottom:14px;
+    -ms-overflow-style:none;scrollbar-width:none;
+  }
+  .chips::-webkit-scrollbar{display:none;}
+  .chip{
+    flex-shrink:0;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    padding:7px 12px;
+    border-radius:20px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--ink-soft);
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .chip.active{
+    background:var(--green-deep);
+    border-color:var(--green-deep);
+    color:#fff;
+  }
+
+  .count-line{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin-bottom:10px;
+    letter-spacing:0.02em;
+  }
+
+  /* tag card */
+  .tag-card{
+    display:flex;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    margin-bottom:10px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .tag-stub{
+    width:56px;
+    flex-shrink:0;
+    background:var(--green-deep);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    border-right:2px dashed rgba(255,255,255,0.35);
+  }
+  .tag-stub .hole{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--paper);
+    margin-bottom:6px;
+  }
+  .tag-stub .tt{
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    font-size:13px;
+    color:#fff;
+    writing-mode:vertical-rl;
+    text-orientation:mixed;
+  }
+  .tag-body{
+    flex:1;
+    padding:12px 14px;
+    display:flex;
+    gap:12px;
+  }
+  .tag-info{flex:1; min-width:0;}
+  .tag-info h3{
+    font-family:'Zilla Slab',serif;
+    font-size:16.5px;
+    font-weight:600;
+    margin:0 0 4px;
+    color:var(--ink);
+  }
+  .tag-info .meta{
+    font-size:13px;
+    color:var(--ink-soft);
+    line-height:1.5;
+  }
+  .tag-info .meta b{color:var(--brass-deep);font-weight:600;}
+  .tag-info .date{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-top:5px;
+    display:inline-block;
+  }
+  .thumb{
+    width:58px;height:58px;
+    border-radius:8px;
+    object-fit:cover;
+    background:var(--line);
+    flex-shrink:0;
+  }
+  .thumb-empty{
+    width:58px;height:58px;
+    border-radius:8px;
+    background:var(--line);
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .thumb-empty svg{width:20px;height:20px;stroke:var(--ink-soft);}
+
+  .empty-state, .loading-state{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--ink-soft);
+  }
+  .empty-state svg{width:34px;height:34px;stroke:var(--brass);margin-bottom:12px;}
+  .empty-state .e-title{font-family:'Zilla Slab',serif;font-size:17px;color:var(--ink);margin-bottom:4px;}
+  .empty-state .e-sub{font-size:13.5px;}
+  .skeleton{
+    height:80px;border-radius:12px;background:linear-gradient(90deg,var(--surface) 25%,var(--line) 37%,var(--surface) 63%);
+    background-size:400% 100%;
+    animation:shimmer 1.4s ease infinite;
+    margin-bottom:10px;
+  }
+  @keyframes shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
+
+  /* ---------- Add tab ---------- */
+  .field{margin-bottom:16px;}
+  .field label{
+    display:block;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:var(--brass-deep);
+    margin-bottom:6px;
+  }
+  .field input[type=text], .field input[type=date]{
+    width:100%;
+    border:1px solid var(--line);
+    background:var(--surface);
+    border-radius:10px;
+    padding:12px 13px;
+    font-family:'Inter',sans-serif;
+    font-size:15.5px;
+    color:var(--ink);
+    outline:none;
+  }
+  .field input:focus{border-color:var(--green-deep);}
+  .suggest-list{
+    display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;
+  }
+  .suggest-pill{
+    font-size:12px;
+    font-family:'IBM Plex Mono',monospace;
+    padding:5px 10px;
+    border-radius:14px;
+    background:var(--ok-bg);
+    color:var(--green-deep);
+    cursor:pointer;
+    border:1px solid transparent;
+  }
+
+  .photo-zone{
+    border:1.5px dashed var(--line);
+    border-radius:12px;
+    background:var(--surface);
+    padding:16px;
+    text-align:center;
+    cursor:pointer;
+    position:relative;
+  }
+  .photo-zone.has-img{padding:10px;}
+  .photo-zone svg{width:26px;height:26px;stroke:var(--brass);margin-bottom:6px;}
+  .photo-zone .ph-label{font-size:13.5px;color:var(--ink-soft);}
+  .photo-zone img{
+    max-width:100%;max-height:180px;
+    border-radius:8px;display:block;margin:0 auto;
+  }
+  .photo-zone input[type=file]{display:none;}
+  .remove-photo{
+    margin-top:8px;
+    font-size:12.5px;
+    color:var(--rust);
+    text-decoration:underline;
+    background:none;border:none;cursor:pointer;
+    font-family:'Inter',sans-serif;
+  }
+
+  .submit-btn{
+    width:100%;
+    background:var(--green-deep);
+    color:#fff;
+    border:none;
+    border-radius:11px;
+    padding:14px;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:15.5px;
+    cursor:pointer;
+    margin-top:6px;
+  }
+  .submit-btn:disabled{opacity:0.55;}
+  .submit-btn:active{transform:scale(0.985);}
+
+  .divider-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin:28px 0 10px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .divider-label::after{content:'';flex:1;height:1px;background:var(--line);}
+
+  .queue-item{
+    display:flex;align-items:center;gap:10px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:10px 12px;
+    margin-bottom:8px;
+  }
+  .queue-item .qi-name{font-size:14px;font-weight:600;flex:1;min-width:0;}
+  .queue-item .qi-sub{font-size:11.5px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;}
+  .status-badge{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    padding:4px 8px;
+    border-radius:20px;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+  .status-badge.pending{background:#F1E9D6;color:var(--brass-deep);}
+  .status-badge.syncing{background:var(--ok-bg);color:var(--green-deep);}
+  .status-badge.error{background:var(--rust-bg);color:var(--rust);}
+  .status-badge.synced{background:var(--ok-bg);color:var(--green-deep);}
+  .retry-btn{
+    background:none;border:1px solid var(--rust);color:var(--rust);
+    font-size:11px;border-radius:8px;padding:5px 9px;cursor:pointer;
+    font-family:'Inter',sans-serif;flex-shrink:0;
+  }
+
+  .sync-bar{
+    display:flex;align-items:center;justify-content:space-between;
+    background:var(--ok-bg);
+    border-radius:10px;
+    padding:10px 14px;
+    margin-bottom:18px;
+    font-size:12.5px;
+    color:var(--green-deep);
+  }
+  .sync-bar button{
+    background:var(--green-deep);color:#fff;border:none;
+    border-radius:8px;padding:7px 11px;font-size:12px;cursor:pointer;
+    font-family:'Inter',sans-serif;font-weight:600;
+  }
+
+  .toast{
+    position:fixed;bottom:90px;left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;
+    padding:11px 18px;border-radius:30px;
+    font-size:13.5px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.2);
+    opacity:0;
+    transition:all .25s ease;
+    pointer-events:none;
+    max-width:90%;
+    text-align:center;
+    z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* ---------- Bottom nav ---------- */
+  nav{
+    position:absolute;bottom:0;left:0;right:0;
+    background:var(--surface);
+    border-top:1px solid var(--line);
+    display:flex;
+    padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+  }
+  .nav-btn{
+    flex:1;
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    padding:7px 0;
+    border:none;background:none;cursor:pointer;
+    color:var(--ink-soft);
+  }
+  .nav-btn svg{width:21px;height:21px;stroke:var(--ink-soft);}
+  .nav-btn span{font-size:11.5px;font-weight:500;font-family:'Inter',sans-serif;}
+  .nav-btn.active{color:var(--green-deep);}
+  .nav-btn.active svg{stroke:var(--green-deep);}
+  .nav-badge{
+    position:absolute;top:2px;right:22%;
+    background:var(--rust);color:#fff;
+    font-size:10px;font-family:'IBM Plex Mono',monospace;
+    border-radius:9px;min-width:16px;height:16px;
+    display:flex;align-items:center;justify-content:center;
+    padding:0 3px;
+  }
+
+  /* ---------- Settings modal ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(33,31,26,0.5);
+    display:none;align-items:center;justify-content:center;
+    z-index:100;padding:20px;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal{
+    background:var(--surface);
+    border-radius:16px;
+    padding:22px;
+    max-width:380px;width:100%;
+    max-height:85vh;overflow-y:auto;
+  }
+  .modal h2{font-family:'Zilla Slab',serif;font-size:19px;margin:0 0 10px;}
+  .modal p{font-size:13.5px;color:var(--ink-soft);line-height:1.6;margin:0 0 14px;}
+  .modal input[type=text]{
+    width:100%;border:1px solid var(--line);background:var(--paper);
+    border-radius:9px;padding:11px 12px;font-size:14px;margin-bottom:12px;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .modal-actions{display:flex;gap:8px;margin-top:6px;}
+  .modal-actions button{
+    flex:1;border-radius:9px;padding:11px;font-size:14px;cursor:pointer;
+    font-family:'Inter',sans-serif;font-weight:600;border:none;
+  }
+  .btn-primary{background:var(--green-deep);color:#fff;}
+  .btn-ghost{background:var(--paper);color:var(--ink-soft);border:1px solid var(--line) !important;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="titleblock">
+      <span class="eyebrow">Kiểm kê &amp; tra cứu</span>
+      <h1>Sổ Dụng Cụ</h1>
+    </div>
+    <button class="gear-btn" id="settingsBtn" aria-label="Cài đặt">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+    </button>
+  </header>
+
+  <main>
+    <!-- SEARCH PANEL -->
+    <section class="panel active" id="panel-search">
+      <div class="search-row">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="searchInput" placeholder="Tìm theo tên, vị trí, địa điểm...">
+        </div>
+        <button class="refresh-btn" id="refreshBtn" aria-label="Làm mới">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+        </button>
+      </div>
+      <div class="chips" id="chipsRow"></div>
+      <div class="count-line" id="countLine"></div>
+      <div id="listContainer"></div>
+    </section>
+
+    <!-- ADD PANEL -->
+    <section class="panel" id="panel-add">
+      <div class="field">
+        <label>Tên dụng cụ</label>
+        <input type="text" id="f_ten" placeholder="VD: Máy khoan cầm tay">
+      </div>
+      <div class="field">
+        <label>Vị trí</label>
+        <input type="text" id="f_vitri" placeholder="VD: Tủ đồ góc bếp">
+        <div class="suggest-list" id="suggestViTri"></div>
+      </div>
+      <div class="field">
+        <label>Địa điểm</label>
+        <input type="text" id="f_diadiem" placeholder="VD: Nhà Yên Viên">
+        <div class="suggest-list" id="suggestDiaDiem"></div>
+      </div>
+      <div class="field">
+        <label>Ngày cập nhật</label>
+        <input type="date" id="f_ngay">
+      </div>
+      <div class="field">
+        <label>Hình ảnh</label>
+        <div class="photo-zone" id="photoZone">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+          <div class="ph-label">Chạm để chụp hoặc chọn ảnh</div>
+          <input type="file" id="f_anh" accept="image/*" capture="environment">
+        </div>
+        <button class="remove-photo" id="removePhoto" style="display:none;">Xoá ảnh đã chọn</button>
+      </div>
+      <button class="submit-btn" id="submitBtn">Lưu dụng cụ</button>
+
+      <div class="divider-label">Hàng đợi đồng bộ</div>
+      <div class="sync-bar" id="syncBar">
+        <span id="syncBarText">Đã đồng bộ đầy đủ</span>
+        <button id="syncNowBtn">Đồng bộ ngay</button>
+      </div>
+      <div id="queueList"></div>
+    </section>
+  </main>
+
+  <nav>
+    <button class="nav-btn active" data-tab="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <span>Tìm kiếm</span>
+    </button>
+    <button class="nav-btn" data-tab="add" style="position:relative;">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      <span>Thêm mới</span>
+      <span class="nav-badge" id="navBadge" style="display:none;">0</span>
+    </button>
+  </nav>
+</div>
+
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <h2>Cài đặt kết nối</h2>
+    <p>Dán đường link Web App của Google Apps Script (bạn lấy được sau khi triển khai trong Sheet). Đường link này dùng chung cho mọi người mở app trên thiết bị này hay thiết bị khác.</p>
+    <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
+    <div class="modal-actions">
+      <button class="btn-ghost" id="modalCancel">Đóng</button>
+      <button class="btn-primary" id="modalSave">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  let scriptUrl = '';
+  let items = [];
+  let queue = [];
+  let activeChip = '';
+
+  const $ = id => document.getElementById(id);
+  const listEl = $('listContainer');
+  const chipsEl = $('chipsRow');
+  const countEl = $('countLine');
+  const queueListEl = $('queueList');
+  const navBadge = $('navBadge');
+  const syncBar = $('syncBar');
+  const syncBarText = $('syncBarText');
+
+  function showToast(msg){
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(()=>t.classList.remove('show'), 2600);
+  }
+
+  function normalize(s){
+    return (s||'').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  }
+
+  function todayStr(){
+    const d = new Date();
+    return d.getDate()+'/'+(d.getMonth()+1)+'/'+(d.getFullYear()%100);
+  }
+  function dateInputToVnFormat(val){
+    if(!val) return todayStr();
+    const [y,m,d] = val.split('-');
+    return parseInt(d,10)+'/'+parseInt(m,10)+'/'+(y.slice(2));
+  }
+
+  // ---------- Storage helpers ----------
+  async function storageGet(key, shared){
+    try{
+      const r = await window.storage.get(key, !!shared);
+      return r ? r.value : null;
+    }catch(e){ return null; }
+  }
+  async function storageSet(key, value, shared){
+    try{ await window.storage.set(key, value, !!shared); }catch(e){ console.error('storage set fail', e); }
+  }
+  async function storageDelete(key, shared){
+    try{ await window.storage.delete(key, !!shared); }catch(e){}
+  }
+  async function storageListKeys(prefix, shared){
+    try{
+      const r = await window.storage.list(prefix, !!shared);
+      return r ? r.keys : [];
+    }catch(e){ return []; }
+  }
+
+  // ---------- Init ----------
+  async function init(){
+    $('f_ngay').value = new Date().toISOString().slice(0,10);
+    scriptUrl = await storageGet('config:scriptUrl', true) || '';
+    await loadQueueFromStorage();
+    renderQueue();
+    if(!scriptUrl){
+      openSettings();
+    } else {
+      const cached = await storageGet('cache:items', false);
+      if(cached){ try{ items = JSON.parse(cached); renderChips(); renderList(); }catch(e){} }
+      fetchData();
+    }
+    maybeAutoSync();
+  }
+
+  // ---------- Settings modal ----------
+  function openSettings(){
+    $('scriptUrlInput').value = scriptUrl;
+    $('settingsModal').classList.add('show');
+  }
+  function closeSettings(){ $('settingsModal').classList.remove('show'); }
+  $('settingsBtn').onclick = openSettings;
+  $('modalCancel').onclick = closeSettings;
+  $('modalSave').onclick = async ()=>{
+    const v = $('scriptUrlInput').value.trim();
+    if(!v){ showToast('Vui lòng dán đường link'); return; }
+    scriptUrl = v;
+    await storageSet('config:scriptUrl', v, true);
+    closeSettings();
+    showToast('Đã lưu cài đặt');
+    fetchData();
+  };
+
+  // ---------- Tabs ----------
+  document.querySelectorAll('.nav-btn').forEach(btn=>{
+    btn.onclick = ()=>{
+      document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      $('panel-'+btn.dataset.tab).classList.add('active');
+      if(btn.dataset.tab === 'search') fetchData();
+    };
+  });
+
+  // ---------- Fetch / render list ----------
+  async function fetchData(){
+    if(!scriptUrl) return;
+    listEl.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
+    const refreshBtn = $('refreshBtn');
+    refreshBtn.classList.add('spin');
+    try{
+      const res = await fetch(scriptUrl);
+      const json = await res.json();
+      if(json.success){
+        items = json.data || [];
+        await storageSet('cache:items', JSON.stringify(items), false);
+        renderChips();
+        renderList();
+      } else {
+        showToast('Không tải được dữ liệu: ' + (json.error||''));
+        renderList();
+      }
+    }catch(e){
+      showToast('Lỗi kết nối — đang hiển thị dữ liệu đã lưu');
+      renderList();
+    }finally{
+      refreshBtn.classList.remove('spin');
+    }
+  }
+  $('refreshBtn').onclick = fetchData;
+
+  function renderChips(){
+    const places = [...new Set(items.map(i=>i.diaDiem).filter(Boolean))];
+    chipsEl.innerHTML = '';
+    if(places.length < 2) return;
+    const allChip = document.createElement('button');
+    allChip.className = 'chip' + (activeChip===''?' active':'');
+    allChip.textContent = 'Tất cả';
+    allChip.onclick = ()=>{ activeChip=''; renderChips(); renderList(); };
+    chipsEl.appendChild(allChip);
+    places.forEach(p=>{
+      const c = document.createElement('button');
+      c.className = 'chip' + (activeChip===p?' active':'');
+      c.textContent = p;
+      c.onclick = ()=>{ activeChip = (activeChip===p? '' : p); renderChips(); renderList(); };
+      chipsEl.appendChild(c);
+    });
+  }
+
+  function getFiltered(){
+    const q = normalize($('searchInput').value);
+    return items.filter(i=>{
+      const matchesQuery = !q || normalize(i.ten).includes(q) || normalize(i.viTri).includes(q) || normalize(i.diaDiem).includes(q);
+      const matchesChip = !activeChip || i.diaDiem === activeChip;
+      return matchesQuery && matchesChip;
+    });
+  }
+
+  function renderList(){
+    const filtered = getFiltered();
+    countEl.textContent = filtered.length + ' / ' + items.length + ' dụng cụ';
+    if(filtered.length === 0){
+      listEl.innerHTML = `<div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <div class="e-title">Không tìm thấy</div>
+        <div class="e-sub">Thử từ khoá khác, hoặc thêm dụng cụ mới ở tab Thêm mới.</div>
+      </div>`;
+      return;
+    }
+    listEl.innerHTML = filtered.map(i=>{
+      const hasImg = i.hinhAnh && i.hinhAnh !== 'Chưa có' && i.hinhAnh.startsWith('http');
+      const thumb = hasImg
+        ? `<img class="thumb" src="${escapeAttr(i.hinhAnh)}" loading="lazy">`
+        : `<div class="thumb-empty"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="M21 15l-5-5L5 21"></path></svg></div>`;
+      return `<div class="tag-card">
+        <div class="tag-stub"><div class="hole"></div><div class="tt">№${escapeHtml(i.tt||'')}</div></div>
+        <div class="tag-body">
+          <div class="tag-info">
+            <h3>${escapeHtml(i.ten)}</h3>
+            <div class="meta"><b>Vị trí:</b> ${escapeHtml(i.viTri||'—')}<br><b>Địa điểm:</b> ${escapeHtml(i.diaDiem||'—')}</div>
+            <span class="date">${escapeHtml(i.ngayCapNhat||'')}</span>
+          </div>
+          ${thumb}
+        </div>
+      </div>`;
+    }).join('');
+  }
+  function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function escapeAttr(s){ return escapeHtml(s); }
+
+  $('searchInput').oninput = renderList;
+
+  // ---------- Autocomplete suggestions ----------
+  function renderSuggestions(){
+    const viTris = [...new Set(items.map(i=>i.viTri).filter(Boolean))].slice(0,6);
+    const diaDiems = [...new Set(items.map(i=>i.diaDiem).filter(Boolean))].slice(0,6);
+    $('suggestViTri').innerHTML = viTris.map(v=>`<span class="suggest-pill">${escapeHtml(v)}</span>`).join('');
+    $('suggestDiaDiem').innerHTML = diaDiems.map(v=>`<span class="suggest-pill">${escapeHtml(v)}</span>`).join('');
+    $('suggestViTri').querySelectorAll('.suggest-pill').forEach(p=>p.onclick=()=>{$('f_vitri').value=p.textContent;});
+    $('suggestDiaDiem').querySelectorAll('.suggest-pill').forEach(p=>p.onclick=()=>{$('f_diadiem').value=p.textContent;});
+  }
+
+  // ---------- Photo handling ----------
+  let pendingImageBase64 = null;
+  let pendingImageMime = 'image/jpeg';
+  $('photoZone').addEventListener('click', (e)=>{ if(e.target.tagName!=='INPUT'){ const inp = document.getElementById('f_anh'); if(inp) inp.click(); } });
+  $('removePhoto').onclick = (e)=>{
+    e.stopPropagation();
+    pendingImageBase64 = null;
+    $('photoZone').classList.remove('has-img');
+    $('photoZone').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="M21 15l-5-5L5 21"></path></svg><div class="ph-label">Chạm để chụp hoặc chọn ảnh</div><input type="file" id="f_anh" accept="image/*" capture="environment">`;
+    bindPhotoInput();
+    $('removePhoto').style.display = 'none';
+  };
+  function bindPhotoInput(){
+    const input = document.getElementById('f_anh');
+    input.onchange = (e)=>{
+      const file = e.target.files[0];
+      if(!file) return;
+      compressImage(file, 1000, 0.72).then(({base64, mime})=>{
+        pendingImageBase64 = base64;
+        pendingImageMime = mime;
+        $('photoZone').classList.add('has-img');
+        $('photoZone').innerHTML = `<img src="data:${mime};base64,${base64}">`;
+        $('removePhoto').style.display = 'inline-block';
+      });
+    };
+  }
+  bindPhotoInput();
+
+  function compressImage(file, maxWidth, quality){
+    return new Promise((resolve, reject)=>{
+      const reader = new FileReader();
+      reader.onload = (e)=>{
+        const img = new Image();
+        img.onload = ()=>{
+          let w = img.width, h = img.height;
+          if(w > maxWidth){ h = Math.round(h * maxWidth / w); w = maxWidth; }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          resolve({ base64: dataUrl.split(',')[1], mime: 'image/jpeg' });
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ---------- Queue (offline-friendly local storage) ----------
+  async function loadQueueFromStorage(){
+    const keys = await storageListKeys('queue:', false);
+    queue = [];
+    for(const k of keys){
+      const v = await storageGet(k, false);
+      if(v){ try{ queue.push(JSON.parse(v)); }catch(e){} }
+    }
+    queue.sort((a,b)=> a.createdAt - b.createdAt);
+  }
+
+  function renderQueue(){
+    if(queue.length === 0){
+      queueListEl.innerHTML = '';
+      navBadge.style.display = 'none';
+      syncBarText.textContent = 'Đã đồng bộ đầy đủ';
+      syncBar.style.background = 'var(--ok-bg)';
+    } else {
+      navBadge.style.display = 'flex';
+      navBadge.textContent = queue.length;
+      syncBarText.textContent = queue.length + ' mục đang chờ đồng bộ';
+      queueListEl.innerHTML = queue.map(q=>{
+        let badge = '<span class="status-badge pending">Chờ đồng bộ</span>';
+        if(q.status==='syncing') badge = '<span class="status-badge syncing">Đang gửi...</span>';
+        if(q.status==='error') badge = '<span class="status-badge error">Lỗi</span> <button class="retry-btn" data-id="'+q.id+'">Thử lại</button>';
+        return `<div class="queue-item">
+          <div style="flex:1;min-width:0;">
+            <div class="qi-name">${escapeHtml(q.ten)}</div>
+            <div class="qi-sub">${escapeHtml(q.diaDiem||'')} · ${escapeHtml(q.ngayCapNhat||'')}</div>
+          </div>
+          ${badge}
+        </div>`;
+      }).join('');
+      queueListEl.querySelectorAll('.retry-btn').forEach(b=>{
+        b.onclick = ()=> syncEntry(queue.find(q=>q.id === b.dataset.id));
+      });
+    }
+  }
+
+  async function persistQueueItem(entry){
+    await storageSet('queue:'+entry.id, JSON.stringify(entry), false);
+  }
+  async function removeQueueItem(id){
+    await storageDelete('queue:'+id, false);
+    queue = queue.filter(q=>q.id!==id);
+  }
+
+  // ---------- Submit form ----------
+  $('submitBtn').onclick = async ()=>{
+    const ten = $('f_ten').value.trim();
+    if(!ten){ showToast('Vui lòng nhập tên dụng cụ'); return; }
+    const entry = {
+      id: 'e'+Date.now()+Math.random().toString(36).slice(2,7),
+      ten,
+      viTri: $('f_vitri').value.trim(),
+      diaDiem: $('f_diadiem').value.trim(),
+      ngayCapNhat: dateInputToVnFormat($('f_ngay').value),
+      imageBase64: pendingImageBase64,
+      imageMimeType: pendingImageMime,
+      status: 'pending',
+      createdAt: Date.now()
+    };
+    queue.push(entry);
+    await persistQueueItem(entry);
+    renderQueue();
+    showToast('Đã lưu — đang thử đồng bộ lên Sheet');
+
+    // reset form
+    $('f_ten').value=''; $('f_vitri').value=''; $('f_diadiem').value='';
+    $('f_ngay').value = new Date().toISOString().slice(0,10);
+    pendingImageBase64 = null;
+    $('photoZone').classList.remove('has-img');
+    $('photoZone').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="M21 15l-5-5L5 21"></path></svg><div class="ph-label">Chạm để chụp hoặc chọn ảnh</div><input type="file" id="f_anh" accept="image/*" capture="environment">`;
+    bindPhotoInput();
+    $('removePhoto').style.display = 'none';
+
+    syncEntry(entry);
+  };
+
+  async function syncEntry(entry){
+    if(!entry) return;
+    if(!scriptUrl){ showToast('Chưa cài đặt đường link đồng bộ'); openSettings(); return; }
+    entry.status = 'syncing';
+    renderQueue();
+    try{
+      const res = await fetch(scriptUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          ten: entry.ten, viTri: entry.viTri, diaDiem: entry.diaDiem,
+          ngayCapNhat: entry.ngayCapNhat, imageBase64: entry.imageBase64, imageMimeType: entry.imageMimeType
+        })
+      });
+      const json = await res.json();
+      if(json.success){
+        await removeQueueItem(entry.id);
+        renderQueue();
+        showToast('"' + entry.ten + '" đã đồng bộ lên Sheet');
+        fetchData();
+      } else {
+        entry.status = 'error';
+        await persistQueueItem(entry);
+        renderQueue();
+        showToast('Đồng bộ lỗi: ' + (json.error||'không rõ'));
+      }
+    }catch(e){
+      entry.status = 'error';
+      await persistQueueItem(entry);
+      renderQueue();
+      showToast('Không có kết nối — sẽ thử lại sau');
+    }
+  }
+
+  $('syncNowBtn').onclick = async ()=>{
+    if(queue.length===0){ showToast('Không có gì để đồng bộ'); return; }
+    for(const entry of [...queue]){ await syncEntry(entry); }
+    await storageSet('meta:lastAutoSync', String(Date.now()), false);
+  };
+
+  async function maybeAutoSync(){
+    const last = await storageGet('meta:lastAutoSync', false);
+    const lastTs = last ? parseInt(last,10) : 0;
+    const oneDay = 24*60*60*1000;
+    if(queue.length > 0 && (Date.now() - lastTs > oneDay)){
+      for(const entry of [...queue]){ await syncEntry(entry); }
+      await storageSet('meta:lastAutoSync', String(Date.now()), false);
+    }
+  }
+
+  // refresh suggestions whenever items load
+  init().then(()=>{ renderSuggestions(); });
+  setInterval(()=>{ renderSuggestions(); }, 5000);
+
+})();
+</script>
+</body>
+</html>
